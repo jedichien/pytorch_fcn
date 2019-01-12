@@ -16,7 +16,7 @@ You will need the following package before you go through the tutorials.<br/>
 2. torchsummary
 
 ### Summary
-FCN is using skipped network which strip the pooling layers from pretrained model to prevent to lose important features while training.
+FCN is using skipped network which stitches the pooling layers of pretrained model to compensate important features while training.
 
 ### Guidance
 I think everyone eagered to see the result while the beginning. Hence, I recommend you to see what you got after this tutorials.
