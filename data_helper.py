@@ -8,6 +8,7 @@ import torch
 from glob import glob
 from imageio import imread
 from PIL import Image
+from labelmap import label_map
 
 mean=[0.485, 0.456, 0.460] # R, G, B
 std =[0.229, 0.224, 0.225] # R, G, B
@@ -18,7 +19,6 @@ class MyDataset(torch.utils.data.Dataset):
         self.data_dir = data_dir
         self.image_shape = image_shape
         self.isTrain = isTrain
-        self.class_map = np.array([[255, 0, 0], [255, 0, 255]], dtype=np.float32)
         if self.isTrain:
             self.image_paths = glob(os.path.join(self.data_dir, 'training', 'image_2', '*.png'))
             self.label_paths = {
@@ -47,8 +47,8 @@ class MyDataset(torch.utils.data.Dataset):
             label_img = np.array(Image.fromarray(imread(label_path)).resize(self.image_shape[0:2][::-1]))
             label = []
             # one-hot-like labels by class
-            for (index, classmap) in enumerate(self.class_map):
-                label_cls = np.all(label_img==classmap, axis=2).astype(np.uint8)
+            for (index, clscolor) in enumerate(label_map):
+                label_cls = np.all(label_img==clscolor, axis=2).astype(np.uint8)
                 label.append(label_cls)
             label = np.array(label, dtype=np.uint8)
             # to tensor
@@ -62,7 +62,6 @@ class MyDataset(torch.utils.data.Dataset):
                 'X': image
             }
         return sample
-    
 
 def denormal(tensor):
     dtensor = tensor.clone()
@@ -74,4 +73,12 @@ def denormal(tensor):
 def toRGB(tensor, dtype=np.uint8):
     dtensor = tensor.clone()
     dtensor = (dtensor.data.cpu().numpy().transpose(0, 2, 3, 1)*255).astype(dtype)
+    dtensor = np.round(dtensor)
+    dtensor = np.clip(dtensor, 0, 255)
     return dtensor
+
+def findmax(tensor, n_class):
+    dnumpy = tensor.data.cpu().numpy()
+    N, _, H, W = dnumpy.shape
+    dnumpy = dnumpy.transpose(0, 2, 3, 1).reshape(-1, n_class).argmax(axis=1).reshape(N, H, W)
+    return dnumpy

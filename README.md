@@ -1,7 +1,7 @@
 # Fully Convolutional Networks for Semantic Segmentation
 ---
 <p>
-    <img src='sample.png' style='width: 90%;height: auto'/>
+    <img src='sample.png' style='width: 90%;height: auto' />
 </p>
 
 Pytorch implementation of [paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf) from berkeley@Jonathan Long.
